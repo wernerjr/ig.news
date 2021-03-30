@@ -15,7 +15,8 @@ type User = {
 
 export default async (request: NextApiRequest, response: NextApiResponse) => {
   if(request.method === 'POST'){
-    const session = await getSession({ req: request });
+    try {
+      const session = await getSession({ req: request });
     
     const user = await fauna.query<User>(
       q.Get(
@@ -61,7 +62,12 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 
     });
 
-    return response.status(200).json({sessionId: stripeCheckoutSession.id});
+    return response.status(200).json({sessionId: stripeCheckoutSession.id});    
+    } catch (error) {
+      console.log(error);
+      console.log(error.message);
+    }
+
   } else {
     response.setHeader('Allow', 'POST');
     response.status(405).end('Method not allowed');
